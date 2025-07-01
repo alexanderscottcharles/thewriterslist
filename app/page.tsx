@@ -11,5 +11,6 @@ export default function Page() {
         1. Submit your work for feedback
         2. Develop your project with other writers
         3. Get your project seen by real industry professionals
-        4. Every year, a list of the best projects will be selected: "the writers list"</p></>
+        4. Every year, a list of the best projects will be selected: "the writers list"
+        contact</p></>
 }
