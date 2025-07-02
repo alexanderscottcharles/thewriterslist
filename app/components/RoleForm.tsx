@@ -75,6 +75,11 @@ export default function RoleForm() {
       </fieldset>
 
       <button type="submit" disabled={pending}>
+         {errors.general && (
+    <p className="text-red-500 mb-4" aria-live="polite">
+      {errors.general.join(", ")}
+    </p>
+  )}
         {pending ? "Submitting..." : "Submit"}
       </button>
     </form>
