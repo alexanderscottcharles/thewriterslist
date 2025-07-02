@@ -1,7 +1,7 @@
 'use server'
 
 import { z } from 'zod'
-import { prisma } from "../lib/prisma"
+import supabase from '../utils/supabase/server'
 
 const signupSchema = z.object({
   title: z.string().min(2).max(100),
@@ -25,22 +25,30 @@ export async function submit(_: unknown, formData: FormData) {
     }
   }
 
-
-  const validatedData = parsed.data as {
-    title: string
-    name: string
-    email: string
-  }
-
   try {
-    await prisma.submission.create({
-      data: validatedData,
-    })
+    const { error } = await supabase
+      .from('submissions')
+      .insert([
+        {
+          title: parsed.data.title,
+          name: parsed.data.name,
+          email: parsed.data.email,
+        },
+      ])
+
+    if (error) {
+      console.error('Supabase insert error:', error)
+      return {
+        errors: { general: [error.message] },
+        values: formValues,
+      }
+    }
+
     return { success: true }
   } catch (err) {
-    console.error(err)
+    console.error('Unexpected error:', err)
     return {
-      errors: { general: ["Could not save to database"] },
+      errors: { general: ['Could not save to database'] },
       values: formValues,
     }
   }
