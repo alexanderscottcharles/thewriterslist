@@ -70,7 +70,7 @@ export default function RoleForm() {
       </fieldset>
 
       <fieldset>
-        {/* role selector now manages its own state and provides the hidden input */}
+      
         <RoleSelector />
       </fieldset>
 
