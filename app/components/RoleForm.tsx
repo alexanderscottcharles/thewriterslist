@@ -3,9 +3,11 @@
 import React, { useState } from "react"
 import { RoleSelector } from "./DropDown"
 import { submit } from "../lib/actions"
-import { redirect, RedirectType } from 'next/navigation'
+import { useRouter } from "next/navigation"
+
 
 export default function RoleForm() {
+  const router = useRouter()
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [values, setValues] = useState({
     title: "",
@@ -35,7 +37,7 @@ export default function RoleForm() {
       setErrors({})
       setValues({ title: "", name: "", email: "" })
       alert("Submitted successfully!")
-      redirect('/Email_Confirmation', RedirectType.replace)
+     router.replace('/Email_Confirmation')
     }
   }
 
