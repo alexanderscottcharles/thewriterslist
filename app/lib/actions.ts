@@ -25,13 +25,18 @@ export async function submit(_: unknown, formData: FormData) {
     }
   }
 
+  // explicitly tell TypeScript these are required now
+  const validatedData = parsed.data as {
+    title: string
+    name: string
+    email: string
+  }
+
   try {
     await prisma.submission.create({
-      data: parsed.data, 
+      data: validatedData,
     })
-    return {
-      success: true,
-    }
+    return { success: true }
   } catch (err) {
     console.error(err)
     return {
