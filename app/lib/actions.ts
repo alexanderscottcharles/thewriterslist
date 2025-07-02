@@ -67,7 +67,28 @@ const { data: existing, error: fetchError } = await supabase
         values: formValues,
       }
     }
+ const RESEND_API_KEY = process.env.RESEND_API_KEY
 
+    const emailResponse = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'Acme <onboarding@resend.dev>', // Change this to your verified sender
+        to: [parsed.data.email],
+        subject: 'Thank you for signing up!',
+        html: `<p>Hi ${parsed.data.name},</p>
+               <p>Thanks for signing up as a ${parsed.data.title}!</p>
+               <p>We appreciate you joining us.</p>`,
+      }),
+    })
+
+    if (!emailResponse.ok) {
+      console.error('Failed to send confirmation email:', await emailResponse.text())
+      // optionally handle or ignore email sending errors gracefully
+    }
     return { success: true }
   } catch (err) {
     console.error('Unexpected error:', err)
