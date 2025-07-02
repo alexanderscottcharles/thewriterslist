@@ -1,40 +1,39 @@
-'use client'
+"use client"
 
-import React, { useState } from 'react'
-import  { RoleSelector } from './DropDown'
-import { submit } from '../lib/actions'
+import React, { useState } from "react"
+import { RoleSelector } from "./DropDown"
+import { submit } from "../lib/actions"
 
 export default function RoleForm() {
-  const [role, setRole] = React.useState('writer')
   const [errors, setErrors] = useState<Record<string, string[]>>({})
- const [values, setValues] = React.useState({
-  title: "",
-  name: "",
-  email: "",
-});
+  const [values, setValues] = useState({
+    title: "",
+    name: "",
+    email: "",
+  })
   const [pending, setPending] = useState(false)
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    console.log("Selected role:", role)
     setPending(true)
+
     const formData = new FormData(event.currentTarget)
-    formData.set('title', role) // add role
+    console.log("formData contents", Object.fromEntries(formData))
 
     const result = await submit(null, formData)
     setPending(false)
 
-    if ('errors' in result) {
+    if ("errors" in result) {
       setErrors(result.errors)
       setValues({
-        title: formData.get('title') as string,
-        name: formData.get('name') as string,
-        email: formData.get('email') as string,
+        title: formData.get("title") as string,
+        name: formData.get("name") as string,
+        email: formData.get("email") as string,
       })
     } else {
       setErrors({})
-      setValues({ title: '', name: '', email: '' })
-      alert('Submitted successfully!')
+      setValues({ title: "", name: "", email: "" })
+      alert("Submitted successfully!")
     }
   }
 
@@ -50,7 +49,7 @@ export default function RoleForm() {
           defaultValue={values.name}
           required
         />
-        {errors.name && <p aria-live="polite">{errors.name.join(', ')}</p>}
+        {errors.name && <p aria-live="polite">{errors.name.join(", ")}</p>}
       </fieldset>
 
       <fieldset>
@@ -63,19 +62,17 @@ export default function RoleForm() {
           defaultValue={values.email}
           required
         />
-        {errors.email && <p aria-live="polite">{errors.email.join(', ')}</p>}
+        {errors.email && <p aria-live="polite">{errors.email.join(", ")}</p>}
       </fieldset>
 
-    <fieldset>
-      <RoleSelector value={role} onChangeAction={setRole} />
-      
-    </fieldset>
+      <fieldset>
+        {/* role selector now manages its own state and provides the hidden input */}
+        <RoleSelector />
+      </fieldset>
 
       <button type="submit" disabled={pending}>
-        {pending ? 'Submitting...' : 'Submit'}
+        {pending ? "Submitting..." : "Submit"}
       </button>
-      
     </form>
-    
   )
 }
