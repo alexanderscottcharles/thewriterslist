@@ -27,11 +27,12 @@ export async function submit(_: unknown, formData: FormData) {
 
   try {
   // check if this email is already in the submissions table
-    const { data: existing, error: fetchError } = await supabase
-      .from('submissions')
-      .select('id')
-      .eq('email', parsed.data.email)
-      .maybeSingle()
+const { data: existing, error: fetchError } = await supabase
+  .from('submissions')
+  .select('id')
+  .eq('email', parsed.data.email)
+  .limit(1)
+  .single();
 
     if (fetchError) {
       console.error('Supabase fetch error:', fetchError)
