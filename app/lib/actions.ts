@@ -26,13 +26,12 @@ export async function submit(_: unknown, formData: FormData) {
   }
 
   try {
-  // check if this email is already in the submissions table
-const { data: existing, error: fetchError } = await supabase
-  .from('submissions')
-  .select('id')
-  .eq('email', parsed.data.email)
-  .limit(1)
-  .single();
+    // Check if email already exists
+    const { data: existing, error: fetchError } = await supabase
+      .from('submissions')
+      .select('id')
+      .eq('email', parsed.data.email)
+      .limit(1)
 
     if (fetchError) {
       console.error('Supabase fetch error:', fetchError)
@@ -42,15 +41,15 @@ const { data: existing, error: fetchError } = await supabase
       }
     }
 
-    if (existing) {
-      // already submitted
+    if (existing && existing.length > 0) {
       return {
         errors: { email: ['You have already submitted this form.'] },
         values: formValues,
       }
     }
 
-    const { error } = await supabase
+    // Insert new submission
+    const { error: insertError } = await supabase
       .from('submissions')
       .insert([
         {
@@ -60,15 +59,16 @@ const { data: existing, error: fetchError } = await supabase
         },
       ])
 
-    if (error) {
-      console.error('Supabase insert error:', error)
+    if (insertError) {
+      console.error('Supabase insert error:', insertError)
       return {
-        errors: { general: [error.message] },
+        errors: { general: [insertError.message] },
         values: formValues,
       }
     }
- const RESEND_API_KEY = process.env.RESEND_API_KEY
 
+    // Send confirmation email via Resend
+    const RESEND_API_KEY = process.env.RESEND_API_KEY
     const emailResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -76,7 +76,7 @@ const { data: existing, error: fetchError } = await supabase
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'Acme <onboarding@resend.dev>', // Change this to your verified sender
+        from: 'Acme <onboarding@resend.dev>', // Change to your verified sender
         to: [parsed.data.email],
         subject: 'Thank you for signing up!',
         html: `<p>Hi ${parsed.data.name},</p>
@@ -87,8 +87,9 @@ const { data: existing, error: fetchError } = await supabase
 
     if (!emailResponse.ok) {
       console.error('Failed to send confirmation email:', await emailResponse.text())
-      // optionally handle or ignore email sending errors gracefully
+      // Optional: decide if this failure should block the form submission or not
     }
+
     return { success: true }
   } catch (err) {
     console.error('Unexpected error:', err)
