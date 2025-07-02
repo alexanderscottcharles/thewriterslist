@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { RoleSelector } from "./DropDown"
 import { submit } from "../lib/actions"
+import { redirect, RedirectType } from 'next/navigation'
 
 export default function RoleForm() {
   const [errors, setErrors] = useState<Record<string, string[]>>({})
@@ -34,6 +35,7 @@ export default function RoleForm() {
       setErrors({})
       setValues({ title: "", name: "", email: "" })
       alert("Submitted successfully!")
+      redirect('/Email_Confirmation', RedirectType.replace)
     }
   }
 
