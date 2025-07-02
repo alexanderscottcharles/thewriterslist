@@ -1,6 +1,7 @@
 "use client";
 
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import * as React from "react";
+import { DropdownMenu } from "radix-ui";
 
 export function RoleSelector({
   value,
