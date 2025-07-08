@@ -14,7 +14,7 @@ export function RoleSelector() {
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
           <button className="border rounded p-2">
-            I am a: {role === "agentManager"
+            {role === "agentManager"
               ? "Agent/Manager"
               : role === "otherProfessional"
               ? "Other Professional"

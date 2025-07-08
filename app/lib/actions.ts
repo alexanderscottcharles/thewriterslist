@@ -2,6 +2,7 @@
 
 import { z } from 'zod'
 import supabase from '../utils/supabase/server'
+/** import resend from "./resend" */
 
 const signupSchema = z.object({
   title: z.string().min(2).max(100),
@@ -99,3 +100,37 @@ export async function submit(_: unknown, formData: FormData) {
     }
   }
 }
+
+
+export async function confirmEmail(uuid: string) {
+  // mark email confirmed
+  const { error: updateError } = await supabase
+    .from("users")
+    .update({ email_confirmed: true })
+    .eq("uuid", uuid);
+
+  if (updateError) throw updateError;
+
+  // fetch the user record
+  const { data, error } = await supabase
+    .from("users")
+    .select("name, email")
+    .eq("uuid", uuid)
+    .single();
+
+  if (error) throw error;
+
+  return data; // { name, email }
+
+}
+
+export async function sendReferralEmail(uuid: string) {
+  const referralLink = `https://yourapp.com/signup?referrer=${uuid}`;
+  await resend.emails.send({
+    from: "YourApp <no-reply@yourapp.com>",
+    to: ["target@email.com"], // ideally look up their email from the DB with the uuid
+    subject: "Share Your Referral Link!",
+    html: `<p>Share this link with friends: <a href="${referralLink}">${referralLink}</a></p>`,
+  });
+}
+

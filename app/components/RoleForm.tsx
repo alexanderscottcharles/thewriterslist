@@ -5,7 +5,6 @@ import { RoleSelector } from "./DropDown"
 import { submit } from "../lib/actions"
 import { useRouter } from "next/navigation"
 
-
 export default function RoleForm() {
   const router = useRouter()
   const [errors, setErrors] = useState<Record<string, string[]>>({})
@@ -21,8 +20,6 @@ export default function RoleForm() {
     setPending(true)
 
     const formData = new FormData(event.currentTarget)
-    console.log("formData contents", Object.fromEntries(formData))
-
     const result = await submit(null, formData)
     setPending(false)
 
@@ -37,49 +34,75 @@ export default function RoleForm() {
       setErrors({})
       setValues({ title: "", name: "", email: "" })
       alert("Submitted successfully!")
-     router.replace('/Email_Confirmation')
+      router.replace("/Email_Confirmation")
     }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <fieldset>
-        <label htmlFor="name">Name</label>
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 bg-white p-6 rounded-xl shadow-md"
+    >
+      {/* NAME FIELD */}
+      <div>
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          Name
+        </label>
         <input
           id="name"
           name="name"
           type="text"
-          placeholder="Name"
+          placeholder="Enter your full name"
           defaultValue={values.name}
           required
+          className="mt-1 w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
         />
-        {errors.name && <p aria-live="polite">{errors.name.join(", ")}</p>}
-      </fieldset>
+        {errors.name && (
+          <p className="text-red-600 text-sm mt-1">{errors.name.join(", ")}</p>
+        )}
+      </div>
 
-      <fieldset>
-        <label htmlFor="email">Email</label>
+      {/* EMAIL FIELD */}
+      <div>
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          Email
+        </label>
         <input
           id="email"
           name="email"
           type="email"
-          placeholder="Email"
+          placeholder="Enter your email"
           defaultValue={values.email}
           required
+          className="mt-1 w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
         />
-        {errors.email && <p aria-live="polite">{errors.email.join(", ")}</p>}
-      </fieldset>
+        {errors.email && (
+          <p className="text-red-600 text-sm mt-1">{errors.email.join(", ")}</p>
+        )}
+      </div>
 
-      <fieldset>
-      
+      {/* ROLE SELECTOR */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Select your role
+        </label>
         <RoleSelector />
-      </fieldset>
+        {errors.title && (
+          <p className="text-red-600 text-sm mt-1">{errors.title.join(", ")}</p>
+        )}
+      </div>
 
-      <button type="submit" disabled={pending}>
-         {errors.general && (
-    <p className="text-red-500 mb-4" aria-live="polite">
-      {errors.general.join(", ")}
-    </p>
-  )}
+      {/* SUBMIT BUTTON & GENERAL ERRORS */}
+      {errors.general && (
+        <p className="text-red-600 text-sm" aria-live="polite">
+          {errors.general.join(", ")}
+        </p>
+      )}
+      <button
+        type="submit"
+        disabled={pending}
+        className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition duration-200 disabled:opacity-50"
+      >
         {pending ? "Submitting..." : "Submit"}
       </button>
     </form>
