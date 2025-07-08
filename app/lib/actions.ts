@@ -2,7 +2,7 @@
 
 import { z } from 'zod'
 import supabase from '../utils/supabase/server'
-/** import resend from "./resend" */
+import { Resend } from "resend" 
 
 const signupSchema = z.object({
   title: z.string().min(2).max(100),
@@ -126,11 +126,15 @@ export async function confirmEmail(uuid: string) {
 
 export async function sendReferralEmail(uuid: string) {
   const referralLink = `https://yourapp.com/signup?referrer=${uuid}`;
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
   await resend.emails.send({
     from: "YourApp <no-reply@yourapp.com>",
-    to: ["target@email.com"], // ideally look up their email from the DB with the uuid
+    to: ["target@email.com"], // ideally look up their email from the DB
     subject: "Share Your Referral Link!",
     html: `<p>Share this link with friends: <a href="${referralLink}">${referralLink}</a></p>`,
   });
 }
+
 
