@@ -1,8 +1,10 @@
 import React from 'react'
+import NavBar from '../components/NavBar'
 
 const Page = () => {
   return (
     <div className="max-w-xl mx-auto p-6 bg-white rounded-lg shadow-md text-gray-800 space-y-6">
+      <NavBar />
       <h1 className="text-2xl font-bold text-green-700">Please check your email!</h1>
       <p>We've sent you a confirmation email. Make sure to confirm your email address to activate your account.</p>
 

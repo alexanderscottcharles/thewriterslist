@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation'
 import copy from 'copy-to-clipboard'
 import { useState } from 'react'
+import NavBar from "../components/NavBar"
 
 export default function EmailConfirmedPage() {
   const uuid = useSearchParams().get('uuid')
@@ -22,6 +23,7 @@ export default function EmailConfirmedPage() {
 
   return (
     <div className="p-6 max-w-xl mx-auto bg-white rounded-xl shadow-md">
+      <div><NavBar /></div>
       <h1 className="text-2xl font-bold mb-4">✅ Email Confirmed!</h1>
       <p className="mb-4 text-gray-700">
         Thanks for confirming your email! Here's your personal referral link:

@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation'
 import copy from 'copy-to-clipboard'
 import { useState } from 'react'
+import NavBar from "../components/NavBar"
 
 export default function EmailConfirmedPage() {
   const uuid = useSearchParams().get('uuid')
@@ -55,6 +56,7 @@ const sendReferralEmail = async () => {
 
 
   return (
+    <div> <div><NavBar /></div>
     <div className="p-6 max-w-xl mx-auto bg-white rounded-xl shadow-md">
       <h1 className="text-2xl font-bold mb-4">✅ Email Confirmed!</h1>
       <p className="mb-4 text-gray-700">
@@ -87,6 +89,7 @@ const sendReferralEmail = async () => {
       ) : (
         <p className="text-red-500">Missing referral ID.</p>
       )}
+    </div>
     </div>
   )
 }
