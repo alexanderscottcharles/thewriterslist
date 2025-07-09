@@ -7,6 +7,9 @@ import { useState } from 'react'
 export default function EmailConfirmedPage() {
   const uuid = useSearchParams().get('uuid')
   const [copied, setCopied] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const referralLink = uuid
     ? `https://thewriterslist.com/signup?referrer=${uuid}`
@@ -17,6 +20,26 @@ export default function EmailConfirmedPage() {
       copy(referralLink)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  const sendReferralEmail = async () => {
+    if (!uuid) return
+    setSending(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/sendReferral', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uuid }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to send email')
+      setEmailSent(true)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setSending(false)
     }
   }
 
@@ -35,10 +58,20 @@ export default function EmailConfirmedPage() {
 
           <button
             onClick={handleCopy}
-            className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded"
+            className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded mr-4"
           >
             {copied ? 'Copied!' : 'Copy your referral link'}
           </button>
+
+          <button
+            onClick={sendReferralEmail}
+            disabled={sending || emailSent}
+            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
+          >
+            {sending ? 'Sending...' : emailSent ? 'Referral Email Sent' : 'Email me my referral link'}
+          </button>
+
+          {error && <p className="text-red-500 mt-2">{error}</p>}
         </>
       ) : (
         <p className="text-red-500">Missing referral ID.</p>
