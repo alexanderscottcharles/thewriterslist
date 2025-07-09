@@ -33,13 +33,15 @@ const { error: updateError } = await supabase
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Redirect based on title
-    const redirectUrl = user.title?.toLowerCase() === 'writer'
-  ? '/writer_landing_page'
-  : '/professional_landing_page';
+    const baseUrl = `${request.headers.get('x-forwarded-proto')}://${request.headers.get('host')}`;
+const redirectUrl = user.title?.trim().toLowerCase() === 'writer'
+  ? `${baseUrl}/writer_landing_page`
+  : `${baseUrl}/professional_landing_page`;
+
+return NextResponse.redirect(redirectUrl);
 
 
-    return NextResponse.redirect(redirectUrl);
+   
   } catch (err) {
     console.error('Unexpected error:', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
