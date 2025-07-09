@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { RoleSelector } from "./DropDown"
 import { submit } from "../lib/actions"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams} from "next/navigation"
+
 
 export default function RoleForm() {
   const router = useRouter()
@@ -19,7 +20,9 @@ export default function RoleForm() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setPending(true)
-
+    
+  const router = useRouter();
+  const searchParams = useSearchParams();
     const formData = new FormData(event.currentTarget)
     const result = await submit(null, formData)
     setPending(false)
@@ -36,6 +39,13 @@ export default function RoleForm() {
       setValues({ title: "", name: "", email: "" })
       router.replace("/Email_Confirmation")
     }
+     useEffect(() => {
+    const ref = searchParams.get("referrer");
+    if (ref) {
+      setReferrer(ref);
+      console.log("Referrer from URL:", ref); // for debugging
+    }
+  }, [searchParams]);
   }
 
   return (
