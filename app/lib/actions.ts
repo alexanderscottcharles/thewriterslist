@@ -77,7 +77,7 @@ export async function submit(_: unknown, formData: FormData) {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'Acme <onboarding@resend.dev>', // Change to your verified sender
+        from: 'Acme <info@thewriterslist.com>', // Change to your verified sender
         to: [parsed.data.email],
         subject: 'Thank you for signing up!',
         html: `<p>Hi ${parsed.data.name},</p>
@@ -125,16 +125,34 @@ export async function confirmEmail(uuid: string) {
 }
 
 export async function sendReferralEmail(uuid: string) {
-  const referralLink = `https://yourapp.com/signup?referrer=${uuid}`;
+  const referralLink = `https://thewriterslist.com/signup?referrer=${uuid}`;
+
+  // Get user's email and name using the same method as confirmEmail
+  const { data, error } = await supabase
+    .from("users")
+    .select("name, email")
+    .eq("uuid", uuid)
+    .single();
+
+  if (error) {
+    console.error("Failed to fetch user email for referral:", error);
+    throw error;
+  }
 
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   await resend.emails.send({
-    from: "YourApp <no-reply@yourapp.com>",
-    to: ["target@email.com"], // ideally look up their email from the DB
+    from: "The Writers List<info@thewriterslist.com>",
+    to: [data.email],
     subject: "Share Your Referral Link!",
-    html: `<p>Share this link with friends: <a href="${referralLink}">${referralLink}</a></p>`,
+    html: `
+      <p>Hi ${data.name},</p>
+      <p>Share your unique referral link with friends:</p>
+      <p><a href="${referralLink}">${referralLink}</a></p>
+      <p>Thanks for helping us grow!</p>
+    `,
   });
 }
+
 
 
