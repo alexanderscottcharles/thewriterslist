@@ -50,41 +50,50 @@ export async function submit(_: unknown, formData: FormData) {
     }
 
     // Insert new submission
-    const { error: insertError } = await supabase
+    const { data: newUser, error: insertError } = await supabase
       .from('submissions')
       .insert([
         {
           title: parsed.data.title,
           name: parsed.data.name,
           email: parsed.data.email,
+          email_confirmed: false,
         },
       ])
+       .select('uuid')  // request uuid to be returned
+  .single()       // expect one row
+      
 
     if (insertError) {
       console.error('Supabase insert error:', insertError)
       return {
-        errors: { general: [insertError.message] },
+        errors: { general: [insertError.message || 'Failed to create user'] },
         values: formValues,
       }
     }
+    const userUuid = newUser.uuid
 
-    // Send confirmation email via Resend
-    const RESEND_API_KEY = process.env.RESEND_API_KEY
-    const emailResponse = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: 'The Writers List <info@thewriterslist.com>', 
-        to: [parsed.data.email],
-        subject: 'Thank you for signing up!',
-        html: `<p>Hi ${parsed.data.name},</p>
-               <p>Thanks for signing up as a ${parsed.data.title}!</p>
-               <p>We appreciate you joining us.</p>`,
-      }),
-    })
+    const confirmationLink = `https://thewriterslist.com/confirm-email?uuid=${userUuid}`
+
+const RESEND_API_KEY = process.env.RESEND_API_KEY
+const emailResponse = await fetch('https://api.resend.com/emails', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${RESEND_API_KEY}`,
+  },
+  body: JSON.stringify({
+    from: 'The Writers List <info@thewriterslist.com>',
+    to: [parsed.data.email],
+    subject: 'Please confirm your email',
+    html: `<p>Hi ${parsed.data.name},</p>
+           <p>Thanks for signing up as a ${parsed.data.title}!</p>
+           <p>Please confirm your email by clicking this link:</p>
+           <p><a href="${confirmationLink}">${confirmationLink}</a></p>`
+  }),
+})
+
+
 
     if (!emailResponse.ok) {
       console.error('Failed to send confirmation email:', await emailResponse.text())
@@ -142,7 +151,7 @@ export async function sendReferralEmail(uuid: string) {
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   await resend.emails.send({
-    from: "The Writers List<info@thewriterslist.com>",
+    from: "The Writers List <info@thewriterslist.com>",
     to: [data.email],
     subject: "Share Your Referral Link!",
     html: `

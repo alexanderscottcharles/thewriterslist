@@ -33,7 +33,6 @@ export default function RoleForm() {
     } else {
       setErrors({})
       setValues({ title: "", name: "", email: "" })
-      alert("Submitted successfully!")
       router.replace("/Email_Confirmation")
     }
   }
