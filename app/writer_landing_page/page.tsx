@@ -2,7 +2,6 @@
 
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { confirmEmail, sendReferralEmail } from '../lib/actions'
 import copy from 'copy-to-clipboard'
 
 export default function ConfirmPage() {
@@ -16,9 +15,12 @@ export default function ConfirmPage() {
 
   useEffect(() => {
     if (!uuid) return
+
     ;(async () => {
       try {
-        const userInfo = await confirmEmail(uuid)
+        const res = await fetch(`/api/confirm-email?uuid=${uuid}`)
+        if (!res.ok) throw new Error('Confirmation failed')
+        const userInfo = await res.json()
         setUser(userInfo)
         setConfirmed(true)
       } catch (e) {
@@ -27,17 +29,6 @@ export default function ConfirmPage() {
       }
     })()
   }, [uuid])
-
-  const handleResendReferral = async () => {
-    if (!uuid) return
-    try {
-      await sendReferralEmail(uuid)
-      alert('Referral email sent!')
-    } catch (e) {
-      console.error(e)
-      alert('Could not send referral email.')
-    }
-  }
 
   const handleCopyLink = () => {
     if (!uuid) return
@@ -48,42 +39,36 @@ export default function ConfirmPage() {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-6 max-w-xl mx-auto bg-white rounded-xl shadow-md">
       {confirmed ? (
         <>
-          <h1 className="text-xl font-bold">Email Confirmed!</h1>
+          <h1 className="text-2xl font-bold mb-2">🎉 Email Confirmed!</h1>
           {user && (
-            <p className="mt-2">
-              Thanks for confirming your email, {user.name}! <br />
+            <p className="text-gray-700 mb-4">
+              Thanks for confirming your email, <strong>{user.name}</strong>!
+              <br />
               We have you as <strong>{user.email}</strong>.
             </p>
           )}
-          <p className="mt-4">
-            Get free credits for every person who signs up:
-            <ul className="list-disc ml-6">
-              <li>screenplays – 3 credits</li>
-              <li>novels – 1 credit</li>
-            </ul>
-          </p>
-          <div className="mt-4 space-x-2">
-            <button
-              onClick={handleResendReferral}
-              className="bg-blue-500 p-2 rounded text-white"
-            >
-              Email me my referral link
-            </button>
-            <button
-              onClick={handleCopyLink}
-              className="bg-green-500 p-2 rounded text-white"
-            >
-              {copied ? 'Copied!' : 'Copy referral signup link'}
-            </button>
-          </div>
+
+          <h2 className="text-lg font-semibold mb-1">Refer friends for free credits:</h2>
+          <ul className="list-disc ml-6 mb-4 text-gray-700">
+            <li>Screenwriters: 3 screenplay credits</li>
+            <li>Novelists: 1 novel credit</li>
+            <li>Professionals: 1 month free access</li>
+          </ul>
+
+          <button
+            onClick={handleCopyLink}
+            className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded transition"
+          >
+            {copied ? '✅ Copied!' : 'Copy your referral link'}
+          </button>
         </>
       ) : error ? (
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-600 font-medium">{error}</p>
       ) : (
-        <p>Confirming...</p>
+        <p className="text-gray-500 italic">Confirming your email...</p>
       )}
     </div>
   )
