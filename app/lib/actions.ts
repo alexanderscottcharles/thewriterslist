@@ -60,7 +60,7 @@ export async function submit(_: unknown, formData: FormData) {
           email_confirmed: false,
         },
       ])
-       .select('uuid')  // request uuid to be returned
+       .select('id')  // request uuid to be returned
   .single()       // expect one row
       
 
@@ -71,7 +71,7 @@ export async function submit(_: unknown, formData: FormData) {
         values: formValues,
       }
     }
-    const userUuid = newUser.uuid
+    const userUuid = newUser.id
 
     const confirmationLink = `https://thewriterslist.com/confirm-email?uuid=${userUuid}`
 
