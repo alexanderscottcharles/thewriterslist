@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     siteName: 'The Writers List',
     images: [
       {
-        url: 'https://thewriterslist.com/og-image.png',
+        url: 'https://thewriterslist.com/opengraph-image.png',
         width: 1200,
         height: 630,
         alt: 'The Writers List Preview',
