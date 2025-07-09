@@ -1,39 +1,46 @@
 import { NextResponse } from 'next/server';
-import supabase from '../utils/supabase/server'
+import supabase from '../utils/supabase/server';
 
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const uuid = url.searchParams.get('uuid');
+  try {
+    const url = new URL(request.url);
+    const id = url.searchParams.get('id');
 
-  if (!uuid) {
-    return NextResponse.json({ error: 'Missing uuid' }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+    }
+
+    // Attempt update
+    const { error: updateError } = await supabase
+      .from('submissions')
+      .update({ email_confirmed: true })
+      .eq('id', id);
+
+    if (updateError) {
+      console.error('Supabase update error:', updateError);
+      return NextResponse.json({ error: 'Failed to confirm email', details: updateError.message }, { status: 500 });
+    }
+
+    // Fetch user to redirect
+    const { data: user, error: fetchError } = await supabase
+      .from('submissions')
+      .select('title')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !user) {
+      console.error('Supabase fetch error:', fetchError);
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Redirect based on title
+    const redirectUrl = user.title === 'Writer'
+      ? '/writers-landing'
+      : '/professionals-landing';
+
+    return NextResponse.redirect(redirectUrl);
+  } catch (err) {
+    console.error('Unexpected error:', err);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-
-  // Update email_confirmed = true for the user
-  const { error: updateError } = await supabase
-    .from('submissions')
-    .update({ email_confirmed: true })
-    .eq('uuid', uuid);
-
-  if (updateError) {
-    return NextResponse.json({ error: 'Failed to confirm email' }, { status: 500 });
-  }
-
-  // Fetch the user to get the role/title
-  const { data: user, error: fetchError } = await supabase
-    .from('submissions')
-    .select('title')
-    .eq('uuid', uuid)
-    .single();
-
-  if (fetchError || !user) {
-    return NextResponse.json({ error: 'User not found' }, { status: 404 });
-  }
-
-  // Redirect to appropriate landing page
-  const redirectUrl = user.title === 'Writer'
-    ? '/writers-landing'
-    : '/professionals-landing';
-
-  return NextResponse.redirect(redirectUrl);
 }
