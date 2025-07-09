@@ -42,7 +42,7 @@ export default function ConfirmPage() {
 
   const handleCopyLink = () => {
     if (!uuid) return
-    const link = `https://yourapp.com/signup?referrer=${uuid}`
+    const link = `https://thewriterslist.com/signup?referrer=${uuid}`
     copy(link)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)

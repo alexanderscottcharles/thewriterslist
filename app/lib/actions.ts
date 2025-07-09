@@ -77,7 +77,7 @@ export async function submit(_: unknown, formData: FormData) {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'Acme <info@thewriterslist.com>', // Change to your verified sender
+        from: 'The Writers List <info@thewriterslist.com>', 
         to: [parsed.data.email],
         subject: 'Thank you for signing up!',
         html: `<p>Hi ${parsed.data.name},</p>
