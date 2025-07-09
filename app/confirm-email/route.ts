@@ -34,9 +34,10 @@ const { error: updateError } = await supabase
     }
 
     // Redirect based on title
-    const redirectUrl = user.title === 'Writer'
-      ? '/writers-landing'
-      : '/professionals-landing';
+    const redirectUrl = user.title?.toLowerCase() === 'writer'
+  ? '/writer_landing_page'
+  : '/professional_landing_page';
+
 
     return NextResponse.redirect(redirectUrl);
   } catch (err) {
