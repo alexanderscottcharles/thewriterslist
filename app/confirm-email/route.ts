@@ -3,18 +3,18 @@ import supabase from '../utils/supabase/server';
 
 export async function GET(request: Request) {
   try {
-    const url = new URL(request.url);
-    const id = url.searchParams.get('id');
+   const url = new URL(request.url);
+const uuid = url.searchParams.get('uuid');
 
-    if (!id) {
-      return NextResponse.json({ error: 'Missing id' }, { status: 400 });
-    }
+if (!uuid) {
+  return NextResponse.json({ error: 'Missing uuid' }, { status: 400 });
+}
 
-    // Attempt update
-    const { error: updateError } = await supabase
-      .from('submissions')
-      .update({ email_confirmed: true })
-      .eq('id', id);
+// Use uuid in your update query
+const { error: updateError } = await supabase
+  .from('submissions')
+  .update({ email_confirmed: true })
+  .eq('id', uuid);
 
     if (updateError) {
       console.error('Supabase update error:', updateError);
@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     const { data: user, error: fetchError } = await supabase
       .from('submissions')
       .select('title')
-      .eq('id', id)
+      .eq('id', uuid)
       .single();
 
     if (fetchError || !user) {
