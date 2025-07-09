@@ -12,6 +12,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: 'The Writers List',
   description: 'The Only Website by Writers, for Writers',
+  metadataBase: new URL("https://thewriterslist.com"),
     openGraph: {
     title: 'The Writers List',
     description: 'A peer network and submission platform for writers.',
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     siteName: 'The Writers List',
     images: [
       {
-        url: 'https://thewriterslist.com/public/opengraph-image.png',
+        url: 'https://thewriterslist.com/opengraph-image.png',
         width: 1200,
         height: 630,
         alt: 'The Writers List Preview',
