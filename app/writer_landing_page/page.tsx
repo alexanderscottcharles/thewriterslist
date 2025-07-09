@@ -22,36 +22,37 @@ export default function EmailConfirmedPage() {
       setTimeout(() => setCopied(false), 2000)
     }
   }
+const sendReferralEmail = async () => {
+  if (!uuid) return
+  setSending(true)
+  setError(null)
+  try {
+    const res = await fetch('/api/sendReferral', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uuid }),
+    })
 
-  const sendReferralEmail = async () => {
-    if (!uuid) return
-    setSending(true)
-    setError(null)
-    try {
-      const res = await fetch('/api/sendReferral', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uuid }),
-      })
-
-          // Try to parse JSON only if response is not empty
     let data = null
     const text = await res.text()
     try {
       data = text ? JSON.parse(text) : null
     } catch {
-      // invalid JSON, data remains null
+      data = null
     }
-     
-      if (!res.ok) throw new Error(data.error || 'Failed to send email')
-        
-      setEmailSent(true)
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setSending(false)
+
+    if (!res.ok) {
+      throw new Error(data?.error ?? 'Failed to send email')
     }
+
+    setEmailSent(true)
+  } catch (err: any) {
+    setError(err.message || 'Unknown error')
+  } finally {
+    setSending(false)
   }
+}
+
 
   return (
     <div className="p-6 max-w-xl mx-auto bg-white rounded-xl shadow-md">
