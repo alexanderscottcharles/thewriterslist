@@ -33,8 +33,18 @@ export default function EmailConfirmedPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uuid }),
       })
-      const data = await res.json()
+
+          // Try to parse JSON only if response is not empty
+    let data = null
+    const text = await res.text()
+    try {
+      data = text ? JSON.parse(text) : null
+    } catch {
+      // invalid JSON, data remains null
+    }
+     
       if (!res.ok) throw new Error(data.error || 'Failed to send email')
+        
       setEmailSent(true)
     } catch (err: any) {
       setError(err.message)
