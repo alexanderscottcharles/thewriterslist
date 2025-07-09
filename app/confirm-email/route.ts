@@ -35,8 +35,9 @@ const { error: updateError } = await supabase
 
     const baseUrl = `${request.headers.get('x-forwarded-proto')}://${request.headers.get('host')}`;
 const redirectUrl = user.title?.trim().toLowerCase() === 'writer'
-  ? `${baseUrl}/writer_landing_page`
-  : `${baseUrl}/professional_landing_page`;
+  ? `${baseUrl}/writer_landing_page?uuid=${uuid}`
+  : `${baseUrl}/professional_landing_page?uuid=${uuid}`
+
 
 return NextResponse.redirect(redirectUrl);
 
