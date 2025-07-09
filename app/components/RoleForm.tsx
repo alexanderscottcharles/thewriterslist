@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 export default function RoleForm() {
   const router = useRouter()
   const [errors, setErrors] = useState<Record<string, string[]>>({})
+  const [referrer, setReferrer] = useState<string | null>(null)
   const [values, setValues] = useState({
     title: "",
     name: "",
@@ -42,6 +43,7 @@ export default function RoleForm() {
       onSubmit={handleSubmit}
       className="space-y-6 bg-white p-6 rounded-xl shadow-md"
     >
+      {referrer && <input type="hidden" name="referred_by" value={referrer} />}
       {/* NAME FIELD */}
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700">

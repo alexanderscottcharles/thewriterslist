@@ -15,6 +15,7 @@ export async function submit(_: unknown, formData: FormData) {
     title: formData.get('title') as string,
     name: formData.get('name') as string,
     email: formData.get('email') as string,
+    referred_by: formData.get('referred_by') as string | null,
   }
 
   const parsed = signupSchema.safeParse(formValues)
@@ -58,6 +59,7 @@ export async function submit(_: unknown, formData: FormData) {
           name: parsed.data.name,
           email: parsed.data.email,
           email_confirmed: false,
+          referred_by: formData.get('referred_by') as string | null,
         },
       ])
        .select('id')  // request uuid to be returned
