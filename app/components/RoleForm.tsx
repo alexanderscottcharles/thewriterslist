@@ -1,13 +1,14 @@
-"use client"
+'use client'
 
 import React, { useState, useEffect } from "react"
 import { RoleSelector } from "./DropDown"
 import { submit } from "../lib/actions"
-import { useRouter, useSearchParams} from "next/navigation"
-
+import { useRouter, useSearchParams } from "next/navigation"
 
 export default function RoleForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [referrer, setReferrer] = useState<string | null>(null)
   const [values, setValues] = useState({
@@ -17,13 +18,26 @@ export default function RoleForm() {
   })
   const [pending, setPending] = useState(false)
 
+  // Set referrer from URL param once on mount
+  useEffect(() => {
+    const ref = searchParams.get("referrer")
+    if (ref) {
+      setReferrer(ref)
+      console.log("Referrer from URL:", ref)
+    }
+  }, [searchParams])
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setPending(true)
-    
-  const router = useRouter();
-  const searchParams = useSearchParams();
+
     const formData = new FormData(event.currentTarget)
+
+    // Append referrer only if exists
+    if (referrer) {
+      formData.append("referred_by", referrer)
+    }
+
     const result = await submit(null, formData)
     setPending(false)
 
@@ -39,13 +53,6 @@ export default function RoleForm() {
       setValues({ title: "", name: "", email: "" })
       router.replace("/Email_Confirmation")
     }
-     useEffect(() => {
-    const ref = searchParams.get("referrer");
-    if (ref) {
-      setReferrer(ref);
-      console.log("Referrer from URL:", ref); // for debugging
-    }
-  }, [searchParams]);
   }
 
   return (
@@ -53,7 +60,9 @@ export default function RoleForm() {
       onSubmit={handleSubmit}
       className="space-y-6 bg-white p-6 rounded-xl shadow-md"
     >
+      {/* Hidden referrer input if exists */}
       {referrer && <input type="hidden" name="referred_by" value={referrer} />}
+      
       {/* NAME FIELD */}
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700">
