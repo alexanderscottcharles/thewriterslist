@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${playfair.variable}`}>
+    <html lang="en" className={`${playfair.variable}`}> <Analytics/>
       <body>{children}</body>
     </html>
   );
