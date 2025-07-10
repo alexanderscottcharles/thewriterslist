@@ -1,6 +1,7 @@
 import './globals.css';
 import { Playfair_Display } from 'next/font/google'
 import type { Metadata } from 'next'
+import { Analytics } from "@vercel/analytics/next"
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
